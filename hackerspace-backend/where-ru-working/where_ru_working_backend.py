@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 import requests
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route("/", methods=['GET'])
 def return_all_map_data():
@@ -28,6 +30,21 @@ def add_new_intern():
 	
 	# Success!
 	return "success"
+
+@app.route("/getstate", methods=['POST'])
+def get_state():
+	data = request.get_json()
+	state = data["state"]
+	db = requests.get("https://api.myjson.com/bins/vxqj0").json()
+	interns = [x for x in db['entries'] if x['location']['state'] == state]
+	print(interns)
+
+	response = {
+		'interns': interns
+	}
+
+	return jsonify(response)
+
 
 if __name__ == "__main__":
 	app.run()
